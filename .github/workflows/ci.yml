@@ -10,10 +10,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  py-docker-ci:
+  py-flask-ci:
     permissions: write-all
     runs-on: ubuntu-latest
-    name: Build and Deploy Docker
+    name: Python flask Build
     continue-on-error: false
     steps:
       - name: Checkout
