@@ -13,7 +13,7 @@ jobs:
   py-flask-ci:
     permissions: write-all
     runs-on: ubuntu-latest
-    name: Python flask Build
+    name: Python Flask Build
     continue-on-error: false
     steps:
       - name: Checkout
@@ -30,4 +30,4 @@ jobs:
 
       - name: Run tests
         run: |
-            python -m pytest -v
+          python -m pytest --cov-report term-missing --cov=project
