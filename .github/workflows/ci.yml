@@ -25,9 +25,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Checkout pull request head so that a commit can be made
-          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -38,25 +35,23 @@ jobs:
         run: |
             pip install -r requirements.txt
 
-      # Begin install-action snippet
-      #
-      - name: Install AppMap tools
-        id: install-appmap
-        uses: getappmap/install-action@v1
-        with:
-          project-type: pip
-          build-patch-file: false
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v9
-      #
-      # End install-action snippet
-
-
       - name: Run tests
         run: |
           python -m pytest --cov-report term-missing --cov=project
 
-      - name: Archive AppMaps
-        uses: getappmap/archive-action@v1
+      - name: Save AppMaps
+        uses: actions/cache/save@v3
+        if: always()
         with:
-          revision: ${{ github.event.pull_request.base.sha }}
+          path: ./tmp/appmap
+          key: appmaps-${{ github.sha }}-${{ github.run_attempt }}
+
+  appmap-analysis:
+    if: always()
+    needs: [py-flask-ci]
+    uses: getappmap/analyze-action/.github/workflows/appmap-analysis.yml@v1
+    permissions:
+      actions: read
+      contents: read
+      checks: write
+      pull-requests: write
