@@ -23,3 +23,10 @@ instance/*.log*
 # pytest files
 .pytest_cache/
 
+
+
+# AppMap artifacts
+/.appmap
+
+# Node modules
+/node_modules

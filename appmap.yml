@@ -1,0 +1,7 @@
+appmap_dir: tmp/appmap
+language: python
+name: appmap-flask-user-management
+packages:
+  - path: unit
+  - path: functional
+  - path: project
