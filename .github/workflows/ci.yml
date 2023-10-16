@@ -1,13 +1,20 @@
 name: 'CI'
 
 on:
+  # Run on pull request, so that the PR can be analyzed.
   pull_request:
-    paths-ignore: [ '**.md' ]
+
+  # Run on merge to the base branch, so that the baseline
+  # AppMap archive can be brought up-to-date.
+  # If your base branch is not 'main', (e.g. 'master', 'develop'),
+  # change this accordingly.
   push:
-    paths-ignore: [ '**.md' ]
     branches:
       - main
-  workflow_dispatch:
+
+  # Run weekly, so that the baseline AppMap artifact does not expire.
+  schedule:
+    - cron: '0 0 * * 0'
 
 jobs:
   py-flask-ci:
@@ -18,6 +25,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Checkout pull request head so that a commit can be made
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -28,6 +38,25 @@ jobs:
         run: |
             pip install -r requirements.txt
 
+      # Begin install-action snippet
+      #
+      - name: Install AppMap tools
+        id: install-appmap
+        uses: getappmap/install-action@v1
+        with:
+          project-type: pip
+          build-patch-file: false
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+      #
+      # End install-action snippet
+
+
       - name: Run tests
         run: |
           python -m pytest --cov-report term-missing --cov=project
+
+      - name: Archive AppMaps
+        uses: getappmap/archive-action@v1
+        with:
+          revision: ${{ github.event.pull_request.base.sha }}
