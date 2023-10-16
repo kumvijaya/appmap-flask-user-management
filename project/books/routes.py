@@ -21,8 +21,8 @@ class BookModel(BaseModel):
 
     @validator('rating')
     def book_rating_check(cls, value):
-        if value not in range(1, 6):
-            raise ValueError('Book rating must be a whole number between 1 and 5')
+        if value not in range(1, 5):
+            raise ValueError('Book rating must be a whole number between 1 and 4')
         return value
 
 
